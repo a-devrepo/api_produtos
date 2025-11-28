@@ -1,0 +1,35 @@
+services:
+  api-produtos:
+    container_name: springboot-apiprodutos
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    networks:
+      - rede_apiprodutos
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bd_produtos
+
+  postgres:
+    image: postgres:16
+    container_name: postgres_apiprodutos
+    environment:
+      POSTGRES_DB: bd_produtos
+      POSTGRES_USER: user_bdprodutos
+      POSTGRES_PASSWORD: pass_bdprodutos
+    ports:
+      - "5435:5432"
+    networks:
+      - rede_apiprodutos
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+networks:
+  rede_apiprodutos:
+    driver: bridge
+volumes:
+  postgres_data:
+
+
