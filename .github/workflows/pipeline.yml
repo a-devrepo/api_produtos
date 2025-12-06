@@ -76,3 +76,27 @@ jobs:
     steps:
       - name: Descrição
         run: echo "Implantando a aplicação em produção."
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: jar-file
+      - name: Listar artefatos baixados
+        run: ls -la
+      - name: Renomear arquivo JAR
+        run: |
+          JAR_FILE=$(ls *.jar)
+          echo "Arquivo JAR baixado: $JAR_FILE"
+          mv $JAR_FILE api-produtos.jar
+      - name: Fazer deploy no Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v20
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: api-produtos
+          environment_name: Api-produtos-env
+          region: us-east-2
+          deployment_package: api-produtos.jar
+          version_label: ${{ github.sha }}
+
+      - name: Limpar arquivos temporários
+        run: rm -f *.jar
